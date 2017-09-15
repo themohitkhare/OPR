@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import time
 import requests
-
+from Ananlysis import Evaluation
 def url(product,page):
     return "https://www.amazon.in/product-reviews/"+ product + "/ref=cm_cr_getr_d_paging_btm_2?pageNumber=" +str(page)
 
@@ -16,7 +16,6 @@ def get_reviews(product,page):
             try:
                 source_code = requests.get(url(product,x),headers = headers, verify=True).text
                 soup = BeautifulSoup(source_code, 'html.parser')
-                print(soup)
                 reviews = soup.find_all('span', {'class': 'a-size-base review-text'})
                 for y in reviews:
                     rlist.append(str(y.string))
@@ -31,8 +30,11 @@ def get_reviews(product,page):
     return rlist
 
 
-product = "B01JLRXIQK"
-for x in get_reviews(product,10):
-    print(x)
-    print('\n')
+product = "B071DF166C"
+list = get_reviews(product,5)
+for x in list:
+    try:
+        Evaluation(x)
+    except:
+        time.sleep(3)
 
