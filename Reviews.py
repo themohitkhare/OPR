@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import time
 import requests
 from Ananlysis import Evaluation
+
 def url(product,page):
     return "https://www.amazon.in/product-reviews/"+ product + "/ref=cm_cr_getr_d_paging_btm_2?pageNumber=" +str(page)
 
@@ -32,9 +33,17 @@ def get_reviews(product,page):
 
 product = "B071DF166C"
 list = get_reviews(product,5)
+posavg,negavg,neuavg = 0,0,0
 for x in list:
     try:
-        Evaluation(x)
+        evalu,pos,neg,neu = Evaluation(x)
+        posavg += float(pos)
+        negavg += float(neg)
+        neuavg += float(neu)
     except:
-        time.sleep(3)
+        time.sleep(5)
+tot = len(list)
+print(posavg/tot)
+print(negavg/tot)
+print(neuavg/tot)
 
