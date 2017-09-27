@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import time
 import requests
+from  Reviews import review
 
 def product():
     prods = {}
@@ -9,7 +10,13 @@ def product():
     headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'}
     source_code = ""
     while source_code == "":
-        source_code = requests.get(p_string, headers = headers, verify=True).text
+        try:
+            source_code = requests.get(p_string, headers = headers, verify=True).text
+        except Exception as e:
+            print(e)
+            time.sleep(5)
+            print("Retring..")
+            continue
         soup = BeautifulSoup(source_code,'html.parser')
         products = soup.find_all('a', {'class':'a-link-normal s-access-detail-page s-color-twister-title-link a-text-normal'})
         for p in products:
@@ -29,6 +36,12 @@ def features():
         print(val," ",p, " ", prods[p])
         pind[val] = prods[p]
         val += 1
-    ind = input("Select a Product")
-    print(prods[ind])
+    ind = int(input("Select a Product: "))
+    feat = str(input("Enter Features: ")).split(" ")
+
+    review(pind[ind],feat)
+
+
 features()
+
+

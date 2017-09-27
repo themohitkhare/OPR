@@ -30,20 +30,21 @@ def get_reviews(product,page):
 
     return rlist
 
-
-product = "B071DF166C"
-list = get_reviews(product,5)
-posavg,negavg,neuavg = 0,0,0
-for x in list:
-    try:
-        evalu,pos,neg,neu = Evaluation(x)
-        posavg += float(pos)
-        negavg += float(neg)
-        neuavg += float(neu)
-    except:
-        time.sleep(5)
-tot = len(list)
-print(posavg/tot)
-print(negavg/tot)
-print(neuavg/tot)
+def review(product, feat,  pnum=5):
+    list = get_reviews(product,pnum)
+    posavg,negavg,neuavg = 0,0,0
+    for x in list:
+        try:
+            for y in feat:
+                if y in x:
+                    evalu,pos,neg,neu = Evaluation(x)
+                    posavg += float(pos)
+                    negavg += float(neg)
+                    neuavg += float(neu)
+        except:
+            time.sleep(5)
+    tot = len(list)
+    print(posavg/tot)
+    print(negavg/tot)
+    print(neuavg/tot)
 
