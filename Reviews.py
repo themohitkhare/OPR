@@ -35,16 +35,22 @@ def review(product, feat,  pnum=5):
     posavg,negavg,neuavg = 0,0,0
     for x in list:
         try:
-            for y in feat:
-                if y in x:
-                    evalu,pos,neg,neu = Evaluation(x)
-                    posavg += float(pos)
-                    negavg += float(neg)
-                    neuavg += float(neu)
+            if len(feat)>0:
+                for y in feat:
+                    if y in x:
+                        evalu,pos,neg,neu = Evaluation(x)
+                        posavg += float(pos)
+                        negavg += float(neg)
+                        neuavg += float(neu)
+            else:
+                evalu,pos,neg,neu = Evaluation(x)
+                posavg += float(pos)
+                negavg += float(neg)
+                neuavg += float(neu)
         except:
             time.sleep(5)
     tot = len(list)
-    print(posavg/tot)
-    print(negavg/tot)
-    print(neuavg/tot)
+    print("Positive: ",posavg/tot)
+    print("Negative: ",negavg/tot)
+    print("Neutral: ",neuavg/tot)
 

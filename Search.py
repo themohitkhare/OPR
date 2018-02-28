@@ -1,3 +1,4 @@
+
 from bs4 import BeautifulSoup
 import time
 import requests
@@ -38,9 +39,10 @@ def features():
         val += 1
     ind = int(input("Select a Product: "))
     feat = str(input("Enter Features: ")).split(" ")
+    page = int(input("Enter Pages: "))
 
-    review(pind[ind],feat)
-
+    review(pind[ind],feat,page)
+    time.sleep(10000)
 
 features()
 
