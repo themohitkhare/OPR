@@ -1,3 +1,6 @@
+'''
+Contains methods that executes a sentiment analysis of a given text and returns the result.
+'''
 from urllib import parse
 import http.client
 import json
@@ -8,7 +11,7 @@ def Evaluation(Article):
     Takes a string as input and returns the sentiment of the the string and probability of
     Positive, Negative and Neutral sentiment.
     :param Article:
-    :return:
+    :return String, String, String, String:
     '''
     text = str(Article)
     # the input method to enter the text and parsing into required encoding

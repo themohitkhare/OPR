@@ -1,3 +1,6 @@
+'''
+Contains methods to get reviews of a product, which is selected by the user in the Search.py module.
+'''
 from bs4 import BeautifulSoup
 import time, sys
 import requests
@@ -10,7 +13,7 @@ def url(product, page):
     given product.
     :param product:
     :param page:
-    :return:
+    :return String:
     '''
     return "https://www.amazon.in/product-reviews/" + product + "/ref=cm_cr_getr_d_paging_btm_2?pageNumber=" + str(page)
 
@@ -20,7 +23,7 @@ def get_reviews(product, page):
     Takes product ID and the page number of the review, returns the list of all the reviews as string.
     :param product:
     :param page:
-    :return:
+    :return List:
     '''
     reviewCount = 10 * page
     loadingCount = 0
@@ -69,7 +72,7 @@ def review(product, feat, pagenum=5):
     :param product:
     :param feat:
     :param pnum:
-    :return:
+    :return None:
     '''
     rlist = get_reviews(product, pagenum)
     reviewCount = 0

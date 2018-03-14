@@ -1,3 +1,6 @@
+'''
+Module contain methods that return products based on a query and search each review of the user for some given features.
+'''
 from bs4 import BeautifulSoup
 import time
 import requests
@@ -7,7 +10,7 @@ from Reviews import review
 def product():
     '''
     Returns the list of products based on the query or item entered bt the user.
-    :return:
+    :return List:
     '''
     prods = {}
     p_name = str(input("Enter Product Name: ")).strip().replace(" ", "+")
@@ -41,15 +44,14 @@ def product():
 
 def features():
     '''
-    A simply fuction to get the features of the the specified product and transfer them to the
+    A simply function to get the features of the the specified product and transfer them to the
     review package to search for the defined features in the the comments.
     if left blank i.e. no feature specified it will return a black list.
-    :return:
+    :return None:
     '''
     prods = product()
     pind = {}
-    val = 1
-    page = 5
+    val, page, reviewCount = 1, 5, 0
     for p in prods:
         print(val, " ", p, " ", prods[p])
         pind[val] = prods[p]
@@ -79,7 +81,7 @@ def features():
         exit(0)
     else:
         review(pind[ind], feat, page)
-    # sleep for deplating result in CommandLine.
+    # sleep for delaying result in CommandLine.
     # time.sleep(10000)
 
 
