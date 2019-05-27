@@ -15,7 +15,7 @@ def url(product, page):
     :param page:
     :return String:
     '''
-    return "https://www.amazon.in/product-reviews/" + product + "/ref=cm_cr_getr_d_paging_btm_2?pageNumber=" + str(page)
+    return "https://www.amazon.in/" + str(product[0]) + "/product-reviews/" + str(product[1]) + "/ref=cm_cr_arp_d_paging_btm_next_2?pageNumber=" + str(page)
 
 
 def get_reviews(product, page):
@@ -38,16 +38,23 @@ def get_reviews(product, page):
         source_code = ''
         while source_code == '':
             try:
-                source_code = requests.get(url(product, x), headers=headers, verify=True).text
+                reviews = []
+                link = url(product, x)
+                source_code = requests.get(link, headers=headers, verify=True).text
                 soup = BeautifulSoup(source_code, 'html.parser')
-                reviews = soup.find_all('span', {'class': 'a-size-base review-text'})
+                reviews = soup.find_all('span', {'class': 'a-size-base review-text review-text-content'})
+                # comments = ''
+                # for y in reviews:
+                #     comments += y.string
+                # soup = BeautifulSoup(source_code, 'html.parser')
+                # reviews = soup.find_all('span')
                 for y in reviews:
                     sys.stdout.write("\r%d%%" % int(100 * (loadingCount / reviewCount)))
                     sys.stdout.flush()
 
                     loadingCount += 1
-                    if y.string != None:
-                        rlist.append(str(y.string))
+                    if y.text != None:
+                        rlist.append(str(y.text))
 
             except Exception as e:
                 # Sleep to deal with server blocks due to multiple requests.
