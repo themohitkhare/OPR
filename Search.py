@@ -4,7 +4,7 @@ Module contain methods that return products based on a query and search each rev
 from bs4 import BeautifulSoup
 import time
 import requests
-from Reviews import review,url
+from Reviews import review, url
 
 
 def product():
@@ -34,7 +34,7 @@ def product():
             if (ch == 'gp') == False:
                 info = p.get('href').split('/')
                 name = info[1]
-                code = info[3]                
+                code = info[3]
                 prods[name] = code
 
     return prods
@@ -52,7 +52,7 @@ def features():
     val, page, reviewCount = 1, 5, 0
     for p in prods:
         print(val, " ", p, " ", prods[p])
-        pind[val] = (p,prods[p])
+        pind[val] = (p, prods[p])
         val += 1
     ind = int(input("Select a Product: "))
     feat = str(input("Enter Features: ")).split(" ")
@@ -61,7 +61,8 @@ def features():
         # Getting the total number of Reviews available.
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'}
-        url = "https://www.amazon.in/" + pind[ind][0] +"/product-reviews/" + pind[ind][1] + "/ref=cm_cr_arp_d_paging_btm_next_2?pageNumber=1"
+        url = "https://www.amazon.in/" + pind[ind][0] + "/product-reviews/" + \
+            pind[ind][1] + "/ref=cm_cr_arp_d_paging_btm_next_2?pageNumber=1"
         source_code = requests.get(url, headers=headers, verify=True).text
         soup = BeautifulSoup(source_code, 'html.parser')
 
@@ -78,9 +79,8 @@ def features():
         print("No review found!")
         exit(0)
     else:
-        review((pind[ind][0],pind[ind][1]), feat, page)
+        review((pind[ind][0], pind[ind][1]), feat, page)
     # sleep for delaying result in CommandLine.
     # time.sleep(10000)
-
 
 features()
