@@ -1,14 +1,3 @@
-# Config
-import configparser
-config = configparser.ConfigParser()
-config.read('settings.config')
-
-
-def getValueOrDefault(section: str, option: str, default):
-    if config.has_option(section, option):
-        return config[section][option]
-    return default
-
 # Helper Functions
 
 
@@ -44,3 +33,13 @@ def isEmpty(array: list) -> bool:
 
 def isNotEmpty(array: list) -> bool:
     return not isEmpty(array)
+
+
+def ToString(array: list) -> str:
+    return " ".join(array)
+
+def AsOne(array: list) -> list:
+    result = []
+    for arr in array:
+        result.extend(arr)
+    return result
