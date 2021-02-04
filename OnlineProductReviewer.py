@@ -93,12 +93,11 @@ class Product(object):
     def __repr__(self) -> str:
         return repr("{}, {}, {}, {}".format(self.productCode, self.ratingCount, self.reviewCount, self.reviews))
 
-    def getCloud(self):
+    def getCloud(self, width=800, height=800, bg_color='black', min_font=10):
         wordcloud = []
         for review in self.reviews:
             wordcloud.extend(review.cloud)
-        cloud = WordCloud(width=800, height=800,
-                          background_color='white',
-                          min_font_size=10).generate(ToString(wordcloud))
+        cloud = WordCloud(width=width, height=height, background_color=bg_color,
+                          min_font_size=min_font).generate(ToString(wordcloud))
 
         return cloud.to_image()
