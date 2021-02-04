@@ -18,7 +18,8 @@ class Review(object):
         reviewTextBlob = TextBlob(review.strip())
         self.review = reviewTextBlob.correct()
         self.sentiment = reviewTextBlob.sentiment.polarity
-        self.cloud = list(set([word.strip() for word, pos in reviewTextBlob.tags if pos == "JJ"]))
+        self.cloud = list(
+            set([word.strip() for word, pos in reviewTextBlob.tags if pos == "JJ"]))
 
     def __repr__(self) -> str:
         return repr("{}, {}, {}".format(self.review, self.sentiment, self.cloud))
@@ -92,7 +93,7 @@ class Product(object):
     def __repr__(self) -> str:
         return repr("{}, {}, {}, {}".format(self.productCode, self.ratingCount, self.reviewCount, self.reviews))
 
-    def showCloud(self):
+    def getCloud(self):
         wordcloud = []
         for review in self.reviews:
             wordcloud.extend(review.cloud)
@@ -100,9 +101,4 @@ class Product(object):
                           background_color='white',
                           min_font_size=10).generate(ToString(wordcloud))
 
-        plt.figure(figsize=(8, 8), facecolor=None)
-        plt.imshow(cloud)
-        plt.axis("off")
-        plt.tight_layout(pad=0)
-
-        plt.show()
+        return cloud.to_image()
