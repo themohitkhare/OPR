@@ -1,3 +1,9 @@
+from time import time
+from Config import getValueOrDefault
+import requests
+from bs4 import BeautifulSoup
+import time
+from OPRExceptions import SoupObjectError
 # Helper Functions
 
 
@@ -38,8 +44,31 @@ def isNotEmpty(array: list) -> bool:
 def ToString(array: list) -> str:
     return " ".join(array)
 
+
 def AsOne(array: list) -> list:
     result = []
     for arr in array:
         result.extend(arr)
     return result
+
+
+# Soup cache implementation
+SoupCache = dict()
+
+
+def GetPageSoup(headers, url):
+    if url not in SoupCache.keys():
+        retryCount = 0
+        while retryCount < getValueOrDefault("Requests", "RetryCount", 5):
+            try:
+                session = requests.Session()
+                session.headers['User-Agent'] = headers
+                soup = BeautifulSoup(session.get(url).content, 'html.parser')
+                session.close()
+                SoupCache[url] = soup
+            except Exception:
+                time.sleep(5)
+                retryCount += 1
+        raise SoupObjectError
+    return SoupCache[url]
+

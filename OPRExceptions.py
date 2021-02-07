@@ -6,3 +6,6 @@ class ProductReviewCountUnavailableException(Exception):
 
 class ReviewsUnavailableException(Exception):
     pass
+
+class SoupObjectError(Exception):
+    pass

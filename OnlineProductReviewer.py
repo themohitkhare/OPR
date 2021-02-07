@@ -1,6 +1,6 @@
 from Config import config, getValueOrDefault
 from OPRExceptions import ProductReviewCountUnavailableException, ReviewsUnavailableException
-from Helper import isNotBlank, isEmpty, ToString, AsOne
+from Helper import GetPageSoup, isNotBlank, isEmpty, ToString, AsOne
 
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
@@ -9,6 +9,9 @@ from bs4 import BeautifulSoup
 import multiprocessing
 from functools import partial
 import time
+import base64
+import io
+import urllib
 import requests
 
 
@@ -32,9 +35,7 @@ class Review(object):
         retryCount = 0
         while retryCount < getValueOrDefault("Requests", "RetryCount", 5):
             try:
-                session = requests.Session()
-                session.headers['User-Agent'] = headers
-                soup = BeautifulSoup(session.get(url).content, 'html.parser')
+                soup = GetPageSoup(headers, url)
                 reviewCountDiv = soup.find_all(
                     'div', {'data-hook': 'cr-filter-info-review-rating-count'})
                 return [int(x) for x in reviewCountDiv[0].find('span').string.strip().replace(',', "").split() if x.isdigit()]
@@ -62,10 +63,7 @@ class Review(object):
         retryCount = 0
         while retryCount < getValueOrDefault("Requests", "RetryCount", 5):
             try:
-                session = requests.Session()
-                session.headers['User-Agent'] = headers
-                soup = BeautifulSoup(session.get(
-                    url).content, 'html.parser')
+                soup = GetPageSoup(headers, url)
                 commentSpans = soup.find_all(
                     'span', {'class': 'a-size-base review-text review-text-content'})
                 for commentSpan in commentSpans:
@@ -88,16 +86,56 @@ class Product(object):
     def __init__(self, code: str):
         self.productCode = code
         self.ratingCount, self.reviewCount = Review.CalculateReviewCount(code)
-        self.reviews = [Review(review) for review in Review.GetReviews(code)]
+        self.reviews = []
+        self.sentiment = 0
+
+    @staticmethod
+    def GetProductName(code):
+        return "None"
 
     def __repr__(self) -> str:
         return repr("{}, {}, {}, {}".format(self.productCode, self.ratingCount, self.reviewCount, self.reviews))
 
-    def getCloud(self, width=800, height=800, bg_color='black', min_font=10):
+    def __getCloud(self, width=800, height=800, bg_color='black', min_font=10):
         wordcloud = []
-        for review in self.reviews:
-            wordcloud.extend(review.cloud)
-        cloud = WordCloud(width=width, height=height, background_color=bg_color,
-                          min_font_size=min_font).generate(ToString(wordcloud))
+        [wordcloud.extend(r.cloud) for r in self.reviews]
 
-        return cloud.to_image()
+        return WordCloud(width=width, height=height, background_color=bg_color,
+                         min_font_size=min_font).generate(ToString(wordcloud))
+
+    def cloudAsImage(self, width=800, height=800, bg_color='black', min_font=10):
+        return self.__getCloud(width=width, height=height, bg_color=bg_color,
+                               min_font=min_font).to_image()
+
+    def cloudAsBase64(self, width=800, height=800, bg_color='black', min_font=10):
+        cloud = self.__getCloud(width=width, height=height, bg_color=bg_color,
+                                min_font=min_font)
+
+        plt.imshow(cloud, interpolation='bilinear')
+        plt.axis("off")
+
+        image = io.BytesIO()
+        plt.savefig(image, format='png')
+        image.seek(0)  # rewind the data
+        string = base64.b64encode(image.read())
+
+        image_64 = 'data:image/png;base64,' + urllib.parse.quote(string)
+        return image_64
+
+    def updateReviews(self, reviewCount=50):
+        pageCount = int(reviewCount / 10)
+        reviews = Review.GetReviews(self.productCode, pageCount)
+        self.reviews.extend([Review(review) for review in reviews])
+
+    def updateSentiment(self):
+        sentiment = sentimentCount = 0
+        for r in self.reviews:
+            sentiment += r.sentiment
+            sentimentCount += 1
+        self.sentiment = sentiment/sentimentCount
+
+
+class ProductSearch(object):
+
+    def __init__(self, productName):
+        self.name = productName
