@@ -1,9 +1,11 @@
 from time import time
-from Config import getValueOrDefault
 import requests
+
 from bs4 import BeautifulSoup
-import time
-from OPRExceptions import SoupObjectError
+
+from oprexceptions import SoupObjectError
+from config import getValueOrDefault
+
 # Helper Functions
 
 
@@ -59,16 +61,19 @@ SoupCache = dict()
 def GetPageSoup(headers, url):
     if url not in SoupCache.keys():
         retryCount = 0
-        while retryCount < getValueOrDefault("Requests", "RetryCount", 5):
+        t = getValueOrDefault("Requests", "RetryCount", 5)
+        retry = True
+        while retryCount < t and retry:
             try:
                 session = requests.Session()
                 session.headers['User-Agent'] = headers
                 soup = BeautifulSoup(session.get(url).content, 'html.parser')
-                session.close()
                 SoupCache[url] = soup
-            except Exception:
+                retry = False
+            except Exception as ex:
+                print(ex)
                 time.sleep(5)
                 retryCount += 1
-        raise SoupObjectError
+        if SoupCache[url] is None:
+            raise SoupObjectError
     return SoupCache[url]
-

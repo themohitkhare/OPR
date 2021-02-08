@@ -1,18 +1,17 @@
-from Config import config, getValueOrDefault
-from OPRExceptions import ProductReviewCountUnavailableException, ReviewsUnavailableException
-from Helper import GetPageSoup, isNotBlank, isEmpty, ToString, AsOne
-
-import matplotlib.pyplot as plt
-from wordcloud import WordCloud
-from textblob import TextBlob
-from bs4 import BeautifulSoup
 import multiprocessing
 from functools import partial
 import time
 import base64
 import io
 import urllib
-import requests
+
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+from textblob import TextBlob
+
+from config import getValueOrDefault
+from oprexceptions import ReviewsUnavailableException
+from helper import GetPageSoup, isNotBlank, isEmpty, ToString, AsOne
 
 
 class Review(object):
@@ -29,6 +28,7 @@ class Review(object):
 
     @staticmethod
     def CalculateReviewCount(productCode):
+        reviewCount = 0
         headers = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'
         url = "https://www.amazon.in/product-reviews/{}/reviewerType=all_reviews/ref=cm_cr_arp_d_paging_btm_next_2?sortBy=recent&pageNumber=1".format(
             productCode)
@@ -38,12 +38,13 @@ class Review(object):
                 soup = GetPageSoup(headers, url)
                 reviewCountDiv = soup.find_all(
                     'div', {'data-hook': 'cr-filter-info-review-rating-count'})
-                return [int(x) for x in reviewCountDiv[0].find('span').string.strip().replace(',', "").split() if x.isdigit()]
+                reviewCount = [int(x) for x in reviewCountDiv[0].find(
+                    'span').string.strip().replace(',', "").split() if x.isdigit()][-1]
             except IndexError:
                 time.sleep(5)
                 retryCount += 1
 
-        raise ProductReviewCountUnavailableException
+        return reviewCount
 
     @staticmethod
     def GetReviews(productCode, pageCount=5):
@@ -85,7 +86,7 @@ class Product(object):
 
     def __init__(self, code: str):
         self.productCode = code
-        self.ratingCount, self.reviewCount = Review.CalculateReviewCount(code)
+        self.reviewCount = Review.CalculateReviewCount(code)
         self.reviews = []
         self.sentiment = 0
 
@@ -94,7 +95,7 @@ class Product(object):
         return "None"
 
     def __repr__(self) -> str:
-        return repr("{}, {}, {}, {}".format(self.productCode, self.ratingCount, self.reviewCount, self.reviews))
+        return repr("{}, {}, {}".format(self.productCode, self.reviewCount, self.reviews))
 
     def __getCloud(self, width=800, height=800, bg_color='black', min_font=10):
         wordcloud = []
