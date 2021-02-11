@@ -11,4 +11,6 @@ def getValueOrDefault(section: str, option: str, default):
         return config[section][option]
     return default
 
+
 setrecursionlimit(getValueOrDefault("System", "RecursionLimit", 10000))
+__all__ = ['config', 'getValueOrDefault']

@@ -1,11 +1,11 @@
 from time import time
 import requests
+import logging as logger
 
 from bs4 import BeautifulSoup
 
-from oprexceptions import SoupObjectError
-from config import getValueOrDefault
-
+from .config import getValueOrDefault
+from .oprexceptions import SoupObjectError
 # Helper Functions
 
 
@@ -55,25 +55,21 @@ def AsOne(array: list) -> list:
 
 
 # Soup cache implementation
-SoupCache = dict()
-
-
 def GetPageSoup(headers, url):
-    if url not in SoupCache.keys():
-        retryCount = 0
-        t = getValueOrDefault("Requests", "RetryCount", 5)
-        retry = True
-        while retryCount < t and retry:
-            try:
-                session = requests.Session()
-                session.headers['User-Agent'] = headers
-                soup = BeautifulSoup(session.get(url).content, 'html.parser')
-                SoupCache[url] = soup
-                retry = False
-            except Exception as ex:
-                print(ex)
-                time.sleep(5)
-                retryCount += 1
-        if SoupCache[url] is None:
-            raise SoupObjectError
-    return SoupCache[url]
+    retryCount = 0
+    soup = None
+    t = getValueOrDefault("Requests", "RetryCount", 5)
+    retry = True
+    while retryCount < t and retry:
+        try:
+            session = requests.Session()
+            session.headers['User-Agent'] = headers
+            soup = BeautifulSoup(session.get(url).content, 'html.parser')
+            session.close()
+            retry = False
+        except Exception as ex:
+            time.sleep(5)
+            retryCount += 1
+    if soup is None:
+        raise SoupObjectError
+    return soup

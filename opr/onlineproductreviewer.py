@@ -1,4 +1,3 @@
-import multiprocessing
 from functools import partial
 import time
 import base64
@@ -9,9 +8,9 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from textblob import TextBlob
 
-from config import getValueOrDefault
-from oprexceptions import ReviewsUnavailableException
-from helper import GetPageSoup, isNotBlank, isEmpty, ToString, AsOne
+from .config import getValueOrDefault
+from .oprexceptions import ReviewsUnavailableException
+from .helper import GetPageSoup, isNotBlank, isEmpty, ToString, AsOne
 
 
 class Review(object):
@@ -49,10 +48,7 @@ class Review(object):
     @staticmethod
     def GetReviews(productCode, pageCount=5):
         reviews = []
-        with multiprocessing.Pool(processes=getValueOrDefault("System", "ParallelProcessCount", 40)) as pool:
-            pages = list(range(1, pageCount + 1))
-            func = partial(Review.GetReview, productCode)
-            reviews.extend(pool.map(func, pages))
+        [reviews.extend(Review.GetReview(productCode, page)) for page in range(1, pageCount + 1)]
         return AsOne(reviews)
 
     @staticmethod
