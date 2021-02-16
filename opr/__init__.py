@@ -1,1 +1,1 @@
-from .onlineproductreviewer import Product, Review
+from .onlineproductreviewer import AmazonProduct, AmazonReview

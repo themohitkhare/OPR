@@ -10,5 +10,5 @@ class ReviewsUnavailableException(Exception):
     pass
 
 
-class SoupObjectError(Exception):
+class DataRequestError(Exception):
     pass

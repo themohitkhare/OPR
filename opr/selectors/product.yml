@@ -1,0 +1,43 @@
+title:
+    css: 'h1.a-size-large a.a-link-normal'
+    type: Text
+style:
+    css: 'div.a-row.a-spacing-top-medium span.a-size-base'
+    type: Text
+reviewcount:
+    css: 'div.a-section.a-spacing-medium span'
+    type: Text
+ratings:
+    css: tr.a-histogram-row
+    multiple: true
+    type: Text
+    children:
+        star:
+            css: 'td.aok-nowrap a.a-link-normal'
+            type: Text
+        value:
+            css: 'td.a-text-right a.a-link-normal'
+            type: Text
+reviews:
+    css: 'div.a-row div.a-section.celwidget'
+    multiple: true
+    type: Text
+    children:
+        title:
+            css: 'a.a-size-base span'
+            type: Text
+        style:
+            css: a.a-size-mini
+            type: Text
+        verified:
+            css: span.a-color-state
+            type: Text
+        date:
+            css: span.a-size-base.a-color-secondary
+            type: Text
+        content:
+            css: 'div.a-row.a-spacing-small span.a-size-base span'
+            type: Text
+        helpful:
+            css: 'span.cr-vote span[data-hook="helpful-vote-statement"]'
+            type: Text
